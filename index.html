@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>KUBERA WARHUNT V5 Pro</title>
+  <meta name="theme-color" content="#120a05">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="toastLayer" class="toast-layer" aria-live="polite" aria-atomic="true"></div>
+  <div id="app">
+    <div class="side-ornament side-left" aria-hidden="true"></div>
+    <div class="side-ornament side-right" aria-hidden="true"></div>
+    <header class="fixed-shell mythic-shell">
+      <div class="topbar mythic-topbar">
+        <div class="header-frame"></div>
+        <img class="kubera-idol" src="assets/header/kubera-idol.png" alt="" aria-hidden="true">
+        <div>
+          <div class="brand">KUBERA WARHUNT V5 Pro</div>
+          <div id="screenTitle" class="screen-title">⚔ SANGRAM</div>
+        </div>
+        <button id="installBtn" class="install-btn hidden" type="button">Install</button>
+      </div>
+      <section class="card glow bankroll-card notification-panel-style">
+        <div class="label">AXYAPATRA</div>
+        <div id="bankValue" class="bank">₹ 30,000</div>
+      </section>
+    </header>
+
+    <main class="content-pad">
+      <section id="screen-sangram" class="screen active">
+        <section class="boards-compact sangram-boards">
+          <div class="board-block keypad-panel keypad-panel-y">
+            <div class="board-title">Y</div>
+            <div class="panel-divider"></div>
+            <div id="boardY" class="treasure-grid compact"></div>
+          </div>
+          <div class="board-block keypad-panel keypad-panel-k">
+            <div class="board-title">K</div>
+            <div class="panel-divider"></div>
+            <div id="boardK" class="treasure-grid compact"></div>
+          </div>
+        </section>
+
+        <section class="action-strip compact-card action-strip-style">
+          <button id="kumbhaBtn" class="warn strip-btn" type="button">Clear Kumbha</button>
+          <button id="undoBtn" class="strip-btn" type="button">Undo</button>
+          <button id="prayogaBtn" class="strip-btn" type="button">Prayoga</button>
+        </section>
+
+        <section class="card compact-card result-panel-style">
+          <div class="label">LAST RESULT</div>
+          <div id="lastResultValue" class="last-result">-</div>
+        </section>
+
+        <section class="card compact-card result-panel-style">
+          <div class="label">NEXT ĀHUTI</div>
+          <div id="nextY" class="ahuti-row">Y -</div>
+          <div id="nextK" class="ahuti-row">K -</div>
+          <div id="nextT" class="total">T 0</div>
+        </section>
+
+        <section class="card compact-card chakra-card">
+          <div class="chakra-line chakra-right">
+            <div class="chakra-copy">
+              <div class="label">CHAKRA</div>
+              <div id="chakraValue" class="chakra-value">Round : 0</div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section id="screen-vyuha" class="screen">
+        <div class="split-grid">
+          <section class="card"><div class="label">YAKSHA</div><div id="vyuhaY" class="state-grid"></div></section>
+          <section class="card"><div class="label">KINNARA</div><div id="vyuhaK" class="state-grid"></div></section>
+        </div>
+      </section>
+
+      <section id="screen-granth" class="screen">
+        <section class="card">
+          <div class="toolbar">
+            <div class="label">GRANTH</div>
+            <div class="btn-row">
+              <button id="exportGranthBtn" type="button">Export</button>
+              <button id="importGranthBtn" type="button">Load</button>
+              <select id="deleteKumbhSelect" class="toolbar-select"><option value="">Select Kumbh</option></select>
+              <button id="deleteGranthBtn" class="warn" type="button">Delete</button>
+              <input id="importGranthFile" type="file" accept="application/json,.csv,text/csv" hidden>
+            </div>
+          </div>
+          <div id="granthList" class="granth-list"></div>
+        </section>
+      </section>
+
+      <section id="screen-drishti" class="screen">
+        <section class="summary-grid">
+          <div class="card stat"><div class="label">Chakras Played</div><div id="sumChakras" class="stat-value">0</div></div>
+          <div class="card stat"><div class="label">Total Āhuti</div><div id="sumAhuti" class="stat-value">0</div></div>
+          <div class="card stat"><div class="label">Net Profit</div><div id="sumProfit" class="stat-value">0</div></div>
+          <div class="card stat"><div class="label">Max Exposure</div><div id="sumExposure" class="stat-value">0</div></div>
+        </section>
+        <section class="card">
+          <div class="toolbar">
+            <div class="label">NUMBER PERFORMANCE</div>
+            <div class="btn-row">
+              <button id="exportCsvBtn" type="button">Export CSV</button>
+              <button id="exportPdfBtn" type="button">Save PDF</button>
+              <button id="loadCsvBtn" type="button">Load CSV</button>
+              <input id="loadCsvFile" type="file" accept=".csv,text/csv" hidden>
+            </div>
+          </div>
+          <div class="table-wrap compact-table"><table id="drishtiTable"><thead><tr><th>Side</th><th>No</th><th>Act</th><th>Win</th><th>Steps</th><th>Prev Loss</th><th>Win Bet</th><th>Net P/L</th><th>Status</th></tr></thead><tbody></tbody></table></div>
+        </section>
+      </section>
+
+      <section id="screen-sopana" class="screen">
+        <section class="card compact-sopana-card">
+          <div class="toolbar">
+            <div class="label">SOPANA - 1ST LADDER</div>
+            <div class="btn-row">
+              <button id="saveLadderBtn" type="button">Save</button>
+              <button id="exportLadderBtn" type="button">Export CSV</button>
+              <button id="loadLadderBtn" type="button">Load CSV</button>
+              <button id="resetLadderBtn" type="button">Reset</button>
+              <input id="loadLadderFile" type="file" accept=".csv,text/csv" hidden>
+            </div>
+          </div>
+          <div class="table-wrap compact-table"><table id="ladderTable"><thead><tr><th>Step</th><th>Bet</th><th>Win Return</th><th>Net Profit</th><th>If Lose Total</th></tr></thead><tbody></tbody></table></div>
+        </section>
+        <section class="card compact-card compact-sopana-card">
+          <div class="toolbar">
+            <div class="label">SOPANA - 2ND LADDER</div>
+            <div class="label subtle-note">Compact editable table</div>
+          </div>
+          <div class="table-wrap compact-table"><table id="secondLadderTable"><thead><tr><th>Step</th><th>Bet</th><th>Win Return</th><th>Net Profit</th><th>If Lose Total</th></tr></thead><tbody></tbody></table></div>
+        </section>
+      </section>
+
+      <section id="screen-yantra" class="screen">
+        <section class="card yantra-card">
+          <div class="label">YANTRA</div>
+          <div class="settings-grid">
+            <label><span>Axyapatra</span><input id="setBankroll" type="number"></label>
+            <label><span>Target $</span><input id="setTargetDollar" type="number"></label>
+            <label><span>Target %</span><input id="setTargetPercent" type="number" step="0.01"></label>
+            <label><span>Stop Loss</span><input id="setStopLoss" type="number"></label>
+            <label><span>Min</span><input id="setMin" type="number"></label>
+            <label><span>Max</span><input id="setMax" type="number"></label>
+            <label><span>Coin Size</span><select id="setCoin"><option>100</option><option>500</option><option>1000</option><option>5000</option><option>10000</option></select></label>
+            <label><span>Target / Number</span><input id="setTargetNum" type="number"></label>
+            <label><span>Double Ladder</span><select id="setDoubleLadder"><option value="off">OFF</option><option value="on">ON</option></select></label>
+            <label><span>Keypad Mode</span><select id="setKeypadMode"><option value="combined">Combined</option><option value="individual">Individual</option></select></label>
+            <label><span>Max Steps</span><input id="setMaxSteps" type="number"></label>
+            <label><span>Safety Reserve</span><input id="setReserve" type="number"></label>
+            <label><span>CAP Rule</span><select id="setCapRule"><option value="on">ON</option><option value="off">OFF</option></select></label>
+            <label><span>Stop Loss / Number</span><input id="setStopLossPerNumber" type="text" inputmode="numeric" placeholder="-100"></label>
+          </div>
+          <div class="save-wrap"><button id="applyYantraBtn" type="button">APPLY YANTRA</button></div>
+        </section>
+      </section>
+
+      <section id="screen-medha" class="screen">
+        <section class="card">
+          <div class="label">MEDHA</div>
+          <div id="medhaPanel" class="medha-panel"></div>
+        </section>
+      </section>
+    </main>
+
+    <nav class="bottom-nav mythic-nav">
+      <button class="nav active" data-target="sangram" type="button"><img src="assets/nav-icons/sangram.png" alt=""><span>Sangram</span></button>
+      <button class="nav" data-target="vyuha" type="button"><img src="assets/nav-icons/vyuha.png" alt=""><span>Vyuha</span></button>
+      <button class="nav" data-target="granth" type="button"><img src="assets/nav-icons/granth.png" alt=""><span>Granth</span></button>
+      <button class="nav" data-target="drishti" type="button"><img src="assets/nav-icons/drishti.png" alt=""><span>Drishti</span></button>
+      <button class="nav" data-target="sopana" type="button"><img src="assets/nav-icons/sopana.png" alt=""><span>Sopana</span></button>
+      <button class="nav" data-target="yantra" type="button"><img src="assets/nav-icons/yantra.png" alt=""><span>Yantra</span></button>
+      <button class="nav" data-target="medha" type="button"><img src="assets/nav-icons/medha.png" alt=""><span>Medha</span></button>
+    </nav>
+  </div>
+
+  <div id="confirmOverlay" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmText">
+      <div id="confirmTitle" class="modal-title">KUMBHA CLEAR</div>
+      <div id="confirmText" class="modal-text">Clear current Kumbh?</div>
+      <div class="modal-actions">
+        <button id="confirmCancelBtn" type="button">Cancel</button>
+        <button id="confirmOkBtn" class="warn" type="button">OK</button>
+      </div>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

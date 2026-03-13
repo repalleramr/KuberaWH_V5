@@ -1,0 +1,12 @@
+{
+  "name": "KUBERA WARHUNT V5",
+  "short_name": "Kubera V5",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#120a05",
+  "theme_color": "#120a05",
+  "icons": [
+    {"src":"./icons/icon-192.png","sizes":"192x192","type":"image/png"},
+    {"src":"./icons/icon-512.png","sizes":"512x512","type":"image/png"}
+  ]
+}
