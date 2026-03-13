@@ -287,3 +287,29 @@ body{
   border-radius:12px;
 }
 .last-result{font-size:28px;font-weight:800;color:var(--gold);margin-top:8px}
+/* Kubera Background */
+body{
+  background-image: url("assets/kubera-bg.jpg");
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/* Dark overlay for readability */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background: rgba(0,0,0,0.35);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* App above background */
+main,
+.app-shell,
+.app-container{
+  position: relative;
+  z-index: 1;
+}
