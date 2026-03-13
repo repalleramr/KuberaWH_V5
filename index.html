@@ -10,20 +10,18 @@
 </head>
 <body>
   <div id="toastLayer" class="toast-layer" aria-live="polite" aria-atomic="true"></div>
+  <div class="visual-flame-left" aria-hidden="true"></div>
+  <div class="visual-flame-right" aria-hidden="true"></div>
   <div id="app">
-    <div class="side-ornament side-left" aria-hidden="true"></div>
-    <div class="side-ornament side-right" aria-hidden="true"></div>
-    <header class="fixed-shell mythic-shell">
-      <div class="topbar mythic-topbar">
-        <div class="header-frame"></div>
-        <img class="kubera-idol" src="assets/header/kubera-idol.png" alt="" aria-hidden="true">
+    <header class="fixed-shell">
+      <div class="topbar">
         <div>
           <div class="brand">KUBERA WARHUNT V5 Pro</div>
           <div id="screenTitle" class="screen-title">⚔ SANGRAM</div>
         </div>
         <button id="installBtn" class="install-btn hidden" type="button">Install</button>
       </div>
-      <section class="card glow bankroll-card notification-panel-style">
+      <section class="card glow bankroll-card">
         <div class="label">AXYAPATRA</div>
         <div id="bankValue" class="bank">₹ 30,000</div>
       </section>
@@ -32,30 +30,28 @@
     <main class="content-pad">
       <section id="screen-sangram" class="screen active">
         <section class="boards-compact sangram-boards">
-          <div class="board-block keypad-panel keypad-panel-y">
+          <div class="board-block">
             <div class="board-title">Y</div>
-            <div class="panel-divider"></div>
             <div id="boardY" class="treasure-grid compact"></div>
           </div>
-          <div class="board-block keypad-panel keypad-panel-k">
+          <div class="board-block">
             <div class="board-title">K</div>
-            <div class="panel-divider"></div>
             <div id="boardK" class="treasure-grid compact"></div>
           </div>
         </section>
 
-        <section class="action-strip compact-card action-strip-style">
+        <section class="action-strip compact-card">
           <button id="kumbhaBtn" class="warn strip-btn" type="button">Clear Kumbha</button>
           <button id="undoBtn" class="strip-btn" type="button">Undo</button>
           <button id="prayogaBtn" class="strip-btn" type="button">Prayoga</button>
         </section>
 
-        <section class="card compact-card result-panel-style">
+        <section class="card compact-card">
           <div class="label">LAST RESULT</div>
           <div id="lastResultValue" class="last-result">-</div>
         </section>
 
-        <section class="card compact-card result-panel-style">
+        <section class="card compact-card">
           <div class="label">NEXT ĀHUTI</div>
           <div id="nextY" class="ahuti-row">Y -</div>
           <div id="nextK" class="ahuti-row">K -</div>
@@ -170,14 +166,14 @@
       </section>
     </main>
 
-    <nav class="bottom-nav mythic-nav">
-      <button class="nav active" data-target="sangram" type="button"><img src="assets/nav-icons/sangram.png" alt=""><span>Sangram</span></button>
-      <button class="nav" data-target="vyuha" type="button"><img src="assets/nav-icons/vyuha.png" alt=""><span>Vyuha</span></button>
-      <button class="nav" data-target="granth" type="button"><img src="assets/nav-icons/granth.png" alt=""><span>Granth</span></button>
-      <button class="nav" data-target="drishti" type="button"><img src="assets/nav-icons/drishti.png" alt=""><span>Drishti</span></button>
-      <button class="nav" data-target="sopana" type="button"><img src="assets/nav-icons/sopana.png" alt=""><span>Sopana</span></button>
-      <button class="nav" data-target="yantra" type="button"><img src="assets/nav-icons/yantra.png" alt=""><span>Yantra</span></button>
-      <button class="nav" data-target="medha" type="button"><img src="assets/nav-icons/medha.png" alt=""><span>Medha</span></button>
+    <nav class="bottom-nav">
+      <button class="nav active" data-target="sangram" type="button">⚔<span>Sangram</span></button>
+      <button class="nav" data-target="vyuha" type="button">🛡<span>Vyuha</span></button>
+      <button class="nav" data-target="granth" type="button">📜<span>Granth</span></button>
+      <button class="nav" data-target="drishti" type="button">👁<span>Drishti</span></button>
+      <button class="nav" data-target="sopana" type="button">🪜<span>Sopana</span></button>
+      <button class="nav" data-target="yantra" type="button">⚙<span>Yantra</span></button>
+      <button class="nav" data-target="medha" type="button">🧠<span>Medha</span></button>
     </nav>
   </div>
 
