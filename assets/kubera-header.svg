@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="360" viewBox="0 0 1440 360" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="720" y1="0" x2="720" y2="360" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2C1308"/>
+      <stop offset="0.55" stop-color="#160A05"/>
+      <stop offset="1" stop-color="#100705"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(720 78) rotate(90) scale(120 360)">
+      <stop stop-color="#F7C56E" stop-opacity="0.55"/>
+      <stop offset="0.55" stop-color="#C56B25" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#FFE0A0"/>
+      <stop offset="0.4" stop-color="#F2BC63"/>
+      <stop offset="1" stop-color="#8B4C11"/>
+    </linearGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+  </defs>
+  <rect width="1440" height="360" rx="28" fill="url(#bg)"/>
+  <rect width="1440" height="360" rx="28" fill="url(#glow)"/>
+  <g opacity="0.2" filter="url(#soft)">
+    <ellipse cx="720" cy="74" rx="150" ry="54" fill="#FDBA61"/>
+  </g>
+  <g opacity="0.95">
+    <path d="M100 40H360L390 66H1050L1080 40H1340" stroke="url(#gold)" stroke-width="4" stroke-linecap="round"/>
+    <path d="M130 305H420L450 280H990L1020 305H1310" stroke="url(#gold)" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+    <path d="M178 40L164 100L192 112L214 46" stroke="url(#gold)" stroke-width="3" opacity="0.7"/>
+    <path d="M1248 40L1262 100L1234 112L1212 46" stroke="url(#gold)" stroke-width="3" opacity="0.7"/>
+    <path d="M650 28L674 58H766L790 28" stroke="url(#gold)" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <g opacity="0.62">
+    <path d="M622 182C632 150 650 126 676 116C690 90 706 78 720 78C734 78 750 90 764 116C790 126 808 150 818 182C796 170 780 162 768 158C767 184 766 214 766 246H674C674 214 673 184 672 158C660 162 644 170 622 182Z" fill="#2B0F06" stroke="url(#gold)" stroke-width="3"/>
+    <circle cx="720" cy="84" r="24" fill="#2B0F06" stroke="url(#gold)" stroke-width="3"/>
+    <path d="M688 132H752" stroke="url(#gold)" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+    <path d="M690 198H750" stroke="url(#gold)" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+  </g>
+  <g opacity="0.75">
+    <path d="M522 228H610" stroke="url(#gold)" stroke-width="2" opacity="0.6"/>
+    <path d="M830 228H918" stroke="url(#gold)" stroke-width="2" opacity="0.6"/>
+    <path d="M488 250H594" stroke="url(#gold)" stroke-width="2" opacity="0.45"/>
+    <path d="M846 250H952" stroke="url(#gold)" stroke-width="2" opacity="0.45"/>
+  </g>
+</svg>
