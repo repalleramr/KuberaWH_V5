@@ -14,8 +14,7 @@ const defaultSettings = {
   reserve: 20000,
   capRule: 'on',
   stopLossPerNumber: -100,
-  attackTiming: 'classic',
-  activeAttackTiming: 'classic'
+  attackMode: 'classic'
 };
 const titles = { sangram:'⚔ SANGRAM', vyuha:'🛡 VYUHA', granth:'📜 GRANTH', drishti:'👁 DRISHTI', sopana:'🪜 SOPANA', yantra:'⚙ YANTRA', medha:'🧠 MEDHA' };
 let deferredPrompt = null;
@@ -31,7 +30,23 @@ const fmtMoney = n => '₹ ' + Number(n || 0).toLocaleString('en-IN');
 const clone = obj => JSON.parse(JSON.stringify(obj));
 const parseSignedInt = (value, fallback=0) => { const cleaned = String(value ?? '').replace(/[^0-9-]/g,'').replace(/(?!^)-/g,''); const n = Number(cleaned); return Number.isFinite(n) ? n : fallback; };
 
-function freshNumber(){ return { status:'I', step:0, ladder:1, activeAt:null, prevLoss:0, winningBet:0, lastNet:0, pendingSecond:false, pendingThird:false }; }
+function getAttackMode(){ return state?.settings?.attackMode || 'classic'; }
+function attackThresholdForMode(mode){ return mode==='thirdstrike' ? 2 : mode==='fourthstrike' ? 3 : 1; }
+function waitingCodeForInfo(info){
+  const mode = getAttackMode();
+  if(mode==='thirdstrike') return 'W2';
+  if(mode==='fourthstrike') return 'W3';
+  return 'W';
+}
+function activateTrackedNumber(info){
+  info.status='A';
+  info.step=1;
+  info.ladder=1;
+  info.activeAt=state.currentChakra;
+  info.prevLoss=0;
+}
+
+function freshNumber(){ return { status:'I', step:0, ladder:1, activeAt:null, prevLoss:0, winningBet:0, lastNet:0, pendingSecond:false, watchCount:0 }; }
 
 function askModal({ title, text, okLabel='OK', cancelLabel='Cancel', okClass='warn' }){
   return new Promise(resolve=>{
@@ -118,7 +133,7 @@ function freshState(){
     activeTab: 'sangram'
   };
 }
-function reviveState(raw){ const base = freshState(); const settings={...base.settings,...(raw.settings||{})}; if(!Number.isFinite(Number(settings.stopLoss)) || Number(settings.stopLoss)<=0) settings.stopLoss = base.settings.stopLoss; if(!Number.isFinite(Number(settings.stopLossPerNumber))) settings.stopLossPerNumber = base.settings.stopLossPerNumber; if(!settings.doubleLadder) settings.doubleLadder = 'on'; if(!settings.attackTiming) settings.attackTiming = 'classic'; if(!settings.activeAttackTiming) settings.activeAttackTiming = settings.activeAttackTiming || 'classic'; return {...base,...raw,settings,numbers:raw.numbers||base.numbers,summary:{...base.summary,...(raw.summary||{})},ladder:Array.isArray(raw.ladder)&&raw.ladder.length?raw.ladder:buildLadder(settings),activeTab:raw.activeTab||'sangram'}; }
+function reviveState(raw){ const base = freshState(); const settings={...base.settings,...(raw.settings||{})}; if(!Number.isFinite(Number(settings.stopLoss)) || Number(settings.stopLoss)<=0) settings.stopLoss = base.settings.stopLoss; if(!Number.isFinite(Number(settings.stopLossPerNumber))) settings.stopLossPerNumber = base.settings.stopLossPerNumber; if(!settings.doubleLadder) settings.doubleLadder = 'on'; return {...base,...raw,settings,numbers:raw.numbers||base.numbers,summary:{...base.summary,...(raw.summary||{})},ladder:Array.isArray(raw.ladder)&&raw.ladder.length?raw.ladder:buildLadder(settings),activeTab:raw.activeTab||'sangram'}; }
 function coreSnapshot(){ return { state: clone(state), pending: clone(pending) }; }
 function historySnapshot(){ return JSON.stringify(coreSnapshot()); }
 function persistedSnapshot(){ return JSON.stringify(coreSnapshot()); }
@@ -158,10 +173,7 @@ function showToast(title,text,kind=''){
   const layer=q('toastLayer'); const el=document.createElement('div'); el.className=`toast ${kind}`; el.innerHTML=`<div class="title">${title}</div><div>${text}</div>`; layer.appendChild(el); setTimeout(()=>el.remove(),3600);
 }
 function glowKey(el){ if(!el) return; el.classList.remove('key-glow'); void el.offsetWidth; el.classList.add('key-glow'); setTimeout(()=>el.classList.remove('key-glow'),220); }
-function currentAttackTiming(){ return state?.settings?.activeAttackTiming || state?.settings?.attackTiming || 'classic'; }
-function isThirdStrikeMode(){ return currentAttackTiming() === 'thirdstrike'; }
-function isFourthStrikeMode(){ return currentAttackTiming() === 'fourthstrike'; }
-function statusCode(info){ if(!info) return '0'; if(info.pendingThird && info.status==='I') return 'W3'; if(info.pendingSecond && info.status==='I') return 'W2'; if(info.status==='A') return `S${Math.max(1, Number(info.step)||1)}`; if(info.status==='B') return 'B'; return info.status; }
+function statusCode(info){ if(!info) return '0'; if(info.status==='W') return waitingCodeForInfo(info); if(info.status==='A') return `S${Math.max(1, Number(info.step)||1)}`; if(info.status==='B') return 'B'; return info.status; }
 function vijayDarshanaDisplay(info){ const bet=currentBetFor(info); const displayStep=Math.max(1,(Number(info.step)||1)-1); const displayNet=(bet*8)-(Number(info.prevLoss)||0); return { bet, displayStep, displayNet }; }
 
 function renderBoards(){
@@ -267,14 +279,14 @@ function renderGranth(){
 
 function renderDrishti(){ q('sumChakras').textContent=Math.max(0,state.currentChakra); q('sumAhuti').textContent=state.summary.totalAhuti; q('sumProfit').textContent=state.liveBankroll-state.settings.bankroll; q('sumExposure').textContent=state.summary.maxExposure; const tbody=q('drishtiTable').querySelector('tbody'); tbody.innerHTML=''; [...state.drishti].reverse().forEach(r=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${r.side}</td><td>${r.number}</td><td>${r.activationChakra}</td><td>${r.winChakra}</td><td>${r.steps}</td><td>${r.prevLoss}</td><td>${r.winBet}</td><td>${r.net}</td><td>${r.status}</td>`; tbody.appendChild(tr); }); }
 function renderSopana(){ const tbody=q('ladderTable').querySelector('tbody'); tbody.innerHTML=''; state.ladder.forEach((row,idx)=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${row.step}</td><td><input class="ladder-bet-input" type="number" data-ladder-index="${idx}" inputmode="numeric" enterkeyhint="next" value="${row.bet}"></td><td>${row.winReturn}</td><td>${row.netProfit}</td><td>${row.ifLoseTotal}</td>`; tbody.appendChild(tr); }); const secondTable=q('secondLadderTable'); if(secondTable){ const tbody2=secondTable.querySelector('tbody'); tbody2.innerHTML=''; let prevLoss=0; for(let i=1;i<=Math.min(state.settings.maxSteps,15);i++){ const bet=secondLadderBet(i); const winReturn=bet*9; prevLoss += bet; const tr=document.createElement('tr'); tr.innerHTML=`<td>S${i}</td><td><input class="ladder-bet-input" type="number" data-second-ladder-index="${i-1}" inputmode="numeric" enterkeyhint="next" value="${bet}"></td><td>${winReturn}</td><td>${winReturn - prevLoss}</td><td>${-prevLoss}</td>`; tbody2.appendChild(tr); } } }
-function renderYantra(){ const s=state.settings; q('setBankroll').value=s.bankroll; q('setTargetDollar').value=s.targetDollar; q('setTargetPercent').value=s.targetPercent; q('setStopLoss').value=s.stopLoss; q('setMin').value=s.min; q('setMax').value=s.max; q('setCoin').value=s.coin; q('setTargetNum').value=s.targetNum; q('setDoubleLadder').value=s.doubleLadder||'on'; q('setKeypadMode').value=s.keypadMode; q('setMaxSteps').value=s.maxSteps; q('setReserve').value=s.reserve; q('setCapRule').value=s.capRule; if(q('setStopLossPerNumber')) q('setStopLossPerNumber').value=s.stopLossPerNumber ?? -100; if(q('setAttackTiming')) q('setAttackTiming').value=s.attackTiming || 'classic'; }
+function renderYantra(){ const s=state.settings; q('setBankroll').value=s.bankroll; q('setTargetDollar').value=s.targetDollar; q('setTargetPercent').value=s.targetPercent; q('setStopLoss').value=s.stopLoss; q('setMin').value=s.min; q('setMax').value=s.max; q('setCoin').value=s.coin; q('setTargetNum').value=s.targetNum; q('setDoubleLadder').value=s.doubleLadder||'on'; q('setKeypadMode').value=s.keypadMode; q('setMaxSteps').value=s.maxSteps; q('setReserve').value=s.reserve; q('setCapRule').value=s.capRule; if(q('setStopLossPerNumber')) q('setStopLossPerNumber').value=s.stopLossPerNumber ?? -100; if(q('setAttackMode')) q('setAttackMode').value=s.attackMode || 'classic'; }
 function renderMedha(){ const active=[]; const cap=[]; ['Y','K'].forEach(side=>{ for(let n=1;n<=9;n++){ const info=state.numbers[side][n]; if(info.status==='A'||info.status==='B') active.push(`${side}${n} ${info.ladder===2?'2S':'S'}${info.step}`); if(info.status==='C') cap.push(`${side}${n}`);} }); q('medhaPanel').innerHTML=`<div class="medha-item"><div class="label">Active Formation</div><div>${active.join(' | ') || 'None'}</div></div><div class="medha-item"><div class="label">CAP Numbers</div><div>${cap.join(' | ') || 'None'}</div></div>`; }
 function renderActiveTab(){ document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id===`screen-${state.activeTab}`)); document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('active',b.dataset.target===state.activeTab)); q('screenTitle').textContent=titles[state.activeTab]||titles.sangram; }
 function renderAll(){ renderActiveTab(); renderBoards(); renderVyuha(); renderSangram(); renderGranth(); renderDrishti(); renderSopana(); renderYantra(); renderMedha(); saveState(); }
 
-function startPrayoga(){ if(state.currentChakra===0 && !(currentKumbh()?.rows?.length)){ state.liveBankroll = state.settings.bankroll; } else if(state.currentChakra!==0 || currentKumbh()?.rows?.length){ state.currentKumbhId=null; state.liveBankroll = state.settings.bankroll; state.currentChakra=0; state.numbers={Y:createSide(),K:createSide()}; state.drishti=[]; state.summary={totalAhuti:0,maxExposure:0}; pending={Y:null,K:null}; } historyStack=[]; redoStack=[]; state.settings.activeAttackTiming = state.settings.attackTiming || 'classic'; const kumbh=ensureKumbh(); state.activeTab='sangram'; renderAll(); showToast('SANGRAM AARAMBHA', `#${String(kumbh.id).padStart(2,'0')} Kumbh ready`); }
-async function clearCurrentSession(){ if(!(await askClearKumbh())) return; state.liveBankroll=state.settings.bankroll; state.currentChakra=0; state.numbers={Y:createSide(),K:createSide()}; state.drishti=[]; state.summary={totalAhuti:0,maxExposure:0}; pending={Y:null,K:null}; state.currentKumbhId=null; historyStack=[]; redoStack=[]; state.settings.activeAttackTiming = state.settings.attackTiming || 'classic'; const kumbh=ensureKumbh(); state.activeTab='sangram'; renderAll(); showToast('KUMBHA SHUDDHI',`#${String(kumbh.id).padStart(2,'0')} Kumbh ready`); }
-function recordSnapshot(){ historyStack.push(historySnapshot()); if(historyStack.length>21) historyStack.shift(); redoStack = []; }
+function startPrayoga(){ if(state.currentChakra===0 && !(currentKumbh()?.rows?.length)){ state.liveBankroll = state.settings.bankroll; } else if(state.currentChakra!==0 || currentKumbh()?.rows?.length){ state.currentKumbhId=null; state.liveBankroll = state.settings.bankroll; state.currentChakra=0; state.numbers={Y:createSide(),K:createSide()}; state.drishti=[]; state.summary={totalAhuti:0,maxExposure:0}; pending={Y:null,K:null}; } const kumbh=ensureKumbh(); state.activeTab='sangram'; renderAll(); showToast('SANGRAM AARAMBHA', `#${String(kumbh.id).padStart(2,'0')} Kumbh ready`); }
+async function clearCurrentSession(){ if(!(await askClearKumbh())) return; state.liveBankroll=state.settings.bankroll; state.currentChakra=0; state.numbers={Y:createSide(),K:createSide()}; state.drishti=[]; state.summary={totalAhuti:0,maxExposure:0}; pending={Y:null,K:null}; state.currentKumbhId=null; const kumbh=ensureKumbh(); state.activeTab='sangram'; renderAll(); showToast('KUMBHA SHUDDHI',`#${String(kumbh.id).padStart(2,'0')} Kumbh ready`); }
+function recordSnapshot(){ historyStack.push(historySnapshot()); if(historyStack.length>20) historyStack.shift(); redoStack = []; }
 function undoLast(){ const prev=historyStack.pop(); if(!prev) return; redoStack.push(historySnapshot()); restoreSnapshot(prev); renderAll(); showToast('CHAKRA PUNARAVRITTI','Last chakra reverted'); }
 function redoLast(){ const next=redoStack.pop(); if(!next) return; historyStack.push(historySnapshot()); restoreSnapshot(next); renderAll(); showToast('CHAKRA PUNARAGAMANA','Last chakra restored'); }
 
@@ -285,22 +297,34 @@ async function resolveNumber(side,num,notes,rowEvents){ const info=state.numbers
     if(!shouldReturn) return;
     info.status='B'; info.ladder=2; info.step=1; info.pendingSecond=false; if(rowEvents) rowEvents.ret.push(`${side}${num}`); notes.push({title:'CAP RETURNED',text:`${side}${num} back on track`,kind:'warn'}); return;
   }
-  if(info.pendingSecond && info.status==='I'){
-    info.pendingSecond=false;
-    info.status='A'; info.step=1; info.ladder=1; info.activeAt=state.currentChakra; info.prevLoss=0; return;
-  }
+  const mode = getAttackMode();
+  const threshold = attackThresholdForMode(mode);
   if(info.status==='I'){
-    if(isThirdStrikeMode()){
-      info.pendingSecond=true; return;
+    if(threshold===1){
+      activateTrackedNumber(info);
+    } else {
+      info.status='W';
+      info.watchCount = 1;
+      info.activeAt = null;
+      info.prevLoss = 0;
+      info.step = 0;
+      info.ladder = 1;
     }
-    info.status='A'; info.step=1; info.ladder=1; info.activeAt=state.currentChakra; info.prevLoss=0; return;
+    return;
+  }
+  if(info.status==='W'){
+    info.watchCount = Number(info.watchCount||0) + 1;
+    if(info.watchCount >= threshold){
+      activateTrackedNumber(info);
+    }
+    return;
   }
   const bet=currentBetFor(info); const totalReturn=bet*9; const net=(bet*8)-info.prevLoss;
   state.liveBankroll += totalReturn;
   info.winningBet=bet; info.lastNet=net; pushDrishti({ side, number:num, activationChakra:info.activeAt ?? state.currentChakra, winChakra:state.currentChakra, steps:info.step, prevLoss:info.prevLoss, winBet:bet, net, status:'WIN' });
   if(rowEvents) rowEvents.np.push(`${side}${num} ${net >= 0 ? '+' : ''}${net}`);
   const vd=vijayDarshanaDisplay(info);
-  info.status='L'; info.pendingSecond=false; notes.push({title:'VIJAY DARSHANA', text:`${side}${num} ${info.ladder===2?'2S':'S'}${vd.displayStep} Āhuti ${vd.bet} Net +${vd.displayNet}`}); }
+  info.status='L'; notes.push({title:'VIJAY DARSHANA', text:`${side}${num} ${info.ladder===2?'2S':'S'}${vd.displayStep} Āhuti ${vd.bet} Net +${vd.displayNet}`}); }
 async function advanceAfterLoss(side,notes,rowEvents,winningNum=null){ for(let n=1;n<=9;n++){ if(winningNum!==null && Number(winningNum)===n) continue; const info=state.numbers[side][n]; if(info.status!=='A' && info.status!=='B') continue; const bet=currentBetFor(info); info.prevLoss += bet; info.step += 1; if(info.ladder===1){ if(await askCapDecision(side,n,info)){ info.status='C'; pushDrishti({ side, number:n, activationChakra:info.activeAt ?? '-', winChakra:'-', steps:info.step, prevLoss:info.prevLoss, winBet:'-', net:soldierStepNetProfit(info), status:'CAP' }); if(rowEvents){ rowEvents.cap.push(`${side}${n}`); rowEvents.np.push(`${side}${n} ${soldierStepNetProfit(info) >= 0 ? '+' : ''}${soldierStepNetProfit(info)}`); } notes.push({title:'REKHA BANDHA', text:`${side}${n} reached CAP`, kind:'warn'}); } else if(info.step>state.settings.maxSteps){ info.status='C'; pushDrishti({ side, number:n, activationChakra:info.activeAt ?? '-', winChakra:'-', steps:state.settings.maxSteps, prevLoss:info.prevLoss, winBet:'-', net:soldierStepNetProfit(info), status:'CAP' }); if(rowEvents){ rowEvents.cap.push(`${side}${n}`); rowEvents.np.push(`${side}${n} ${soldierStepNetProfit(info) >= 0 ? '+' : ''}${soldierStepNetProfit(info)}`); } notes.push({title:'REKHA BANDHA', text:`${side}${n} reached CAP`, kind:'warn'}); }
       else info.status='A';
     } else { if(info.step>15) info.step=15; info.status='B'; }
@@ -413,25 +437,26 @@ function resolveNumberSilent(side,num,rowEvents,shouldReturnFromCap=false){
     if(rowEvents) rowEvents.ret.push(`${side}${num}`);
     return;
   }
-  if(info.pendingSecond && info.status==='I'){
-    info.pendingSecond=false;
-    info.status='A';
-    info.step=1;
-    info.ladder=1;
-    info.activeAt=state.currentChakra;
-    info.prevLoss=0;
+  const mode = getAttackMode();
+  const threshold = attackThresholdForMode(mode);
+  if(info.status==='I'){
+    if(threshold===1){
+      activateTrackedNumber(info);
+    } else {
+      info.status='W';
+      info.watchCount = 1;
+      info.activeAt = null;
+      info.prevLoss = 0;
+      info.step = 0;
+      info.ladder = 1;
+    }
     return;
   }
-  if(info.status==='I'){
-    if(isThirdStrikeMode()){
-      info.pendingSecond=true;
-      return;
+  if(info.status==='W'){
+    info.watchCount = Number(info.watchCount||0) + 1;
+    if(info.watchCount >= threshold){
+      activateTrackedNumber(info);
     }
-    info.status='A';
-    info.step=1;
-    info.ladder=1;
-    info.activeAt=state.currentChakra;
-    info.prevLoss=0;
     return;
   }
   const bet=currentBetFor(info);
@@ -443,7 +468,6 @@ function resolveNumberSilent(side,num,rowEvents,shouldReturnFromCap=false){
   pushDrishti({ side, number:num, activationChakra:info.activeAt ?? state.currentChakra, winChakra:state.currentChakra, steps:info.step, prevLoss:info.prevLoss, winBet:bet, net, status:'WIN' });
   if(rowEvents) rowEvents.np.push(`${side}${num} ${net >= 0 ? '+' : ''}${net}`);
   info.status='L';
-  info.pendingSecond=false;
 }
 function advanceAfterLossSilent(side,rowEvents,winningNum=null){
   for(let n=1;n<=9;n++){
@@ -546,9 +570,7 @@ function replayAllKumbhsWithCurrentSettings(){
   const preserved = {
     granth: clone(state.granth),
     currentKumbhId: state.currentKumbhId,
-    activeTab: state.activeTab,
-    attackTiming: state.settings.attackTiming,
-    activeAttackTiming: state.settings.activeAttackTiming
+    activeTab: state.activeTab
   };
   let activeSnapshot = null;
   for(const kumbh of preserved.granth){
@@ -750,18 +772,14 @@ function readYantraSettings(){
   current.maxSteps = Number(q('setMaxSteps').value)||30;
   current.reserve = Number(q('setReserve').value)||20000;
   current.capRule = q('setCapRule').value || 'on';
+  if(q('setAttackMode')) current.attackMode = q('setAttackMode').value || 'classic';
   const stopLossPerNumberValue = Number(q('setStopLossPerNumber').value);
   current.stopLossPerNumber = Number.isFinite(stopLossPerNumberValue) ? stopLossPerNumberValue : -100;
-  current.attackTiming = q('setAttackTiming')?.value || current.attackTiming || 'classic';
-  current.activeAttackTiming = current.activeAttackTiming || current.attackTiming || 'classic';
   return current;
 }
 async function applyYantraSettings(){
   if(!(await askApplyYantra())) return;
-  const prevActiveAttackTiming = state.settings.activeAttackTiming || state.settings.attackTiming || 'classic';
   state.settings = readYantraSettings();
-  if(state.currentChakra>0 || (currentKumbh()?.rows?.length)) state.settings.activeAttackTiming = prevActiveAttackTiming;
-  else state.settings.activeAttackTiming = state.settings.attackTiming || 'classic';
   state.ladder = buildLadder(state.settings);
   const hasRecordedRows = state.granth.some(k => Array.isArray(k.rows) && k.rows.length);
   if(hasRecordedRows){
