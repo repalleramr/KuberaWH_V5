@@ -3,20 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>KUBERA WARHUNT V5 Pro</title>
+  <title>Kubera_V5Pro Final locked</title>
   <meta name="theme-color" content="#120a05">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div id="toastLayer" class="toast-layer" aria-live="polite" aria-atomic="true"></div>
-  <div class="visual-flame-left" aria-hidden="true"></div>
-  <div class="visual-flame-right" aria-hidden="true"></div>
   <div id="app">
     <header class="fixed-shell">
       <div class="topbar">
         <div>
-          <div class="brand">KUBERA WARHUNT V5 Pro</div>
+          <div class="brand">Kubera_V5Pro Final locked</div>
           <div id="screenTitle" class="screen-title">⚔ SANGRAM</div>
         </div>
         <button id="installBtn" class="install-btn hidden" type="button">Install</button>
@@ -43,6 +41,7 @@
         <section class="action-strip compact-card">
           <button id="kumbhaBtn" class="warn strip-btn" type="button">Clear Kumbha</button>
           <button id="undoBtn" class="strip-btn" type="button">Undo</button>
+          <button id="redoBtn" class="strip-btn" type="button">Redo</button>
           <button id="prayogaBtn" class="strip-btn" type="button">Prayoga</button>
         </section>
 
@@ -80,6 +79,7 @@
           <div class="toolbar">
             <div class="label">GRANTH</div>
             <div class="btn-row">
+              <select id="granthExportFormat" class="toolbar-select"><option value="json">JSON</option><option value="csv">CSV</option></select>
               <button id="exportGranthBtn" type="button">Export</button>
               <button id="importGranthBtn" type="button">Load</button>
               <select id="deleteKumbhSelect" class="toolbar-select"><option value="">Select Kumbh</option></select>
@@ -152,6 +152,7 @@
             <label><span>Max Steps</span><input id="setMaxSteps" type="number"></label>
             <label><span>Safety Reserve</span><input id="setReserve" type="number"></label>
             <label><span>CAP Rule</span><select id="setCapRule"><option value="on">ON</option><option value="off">OFF</option></select></label>
+            <label><span>Attack Mode</span><select id="setAttackMode"><option value="classic">Classic</option><option value="thirdstrike">ThirdStrike</option><option value="fourthstrike">FourthStrike</option></select></label>
             <label><span>Stop Loss / Number</span><input id="setStopLossPerNumber" type="text" inputmode="numeric" placeholder="-100"></label>
           </div>
           <div class="save-wrap"><button id="applyYantraBtn" type="button">APPLY YANTRA</button></div>
